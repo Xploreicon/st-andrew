@@ -1,16 +1,46 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const data = await req.json();
+    const data = await request.json();
     
-    // TODO: Connect to email service (e.g. Resend, Brevo) or a database
-    // For now, securely log to console to prove it hit the Next.js API
-    console.log("New contact form submission:", data);
+    const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
-    return NextResponse.json({ success: true, message: "Submission logged successfully." }, { status: 200 });
+    if (!RESEND_API_KEY) {
+      // Fallback: log to console if no API key yet
+      console.log("New project inquiry:", data);
+      return NextResponse.json({ success: true, message: "Received (email not configured yet)" });
+    }
+
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Portfolio <noreply@resend.dev>",
+        to: process.env.CONTACT_EMAIL || "hello@example.com",
+        subject: `New Project Inquiry from ${data.name}`,
+        html: `
+          <h2>New Project Inquiry</h2>
+          <p><strong>Name:</strong> ${data.name}</p>
+          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Project Type:</strong> ${data.projectType}</p>
+          <p><strong>Budget:</strong> ${data.budget}</p>
+          <p><strong>Details:</strong> ${data.details}</p>
+        `,
+      }),
+    });
+
+    if (!res.ok) {
+      console.error("Resend API error:", await res.text());
+      return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Contact API Error:", error);
-    return NextResponse.json({ success: false, message: "Bad Request" }, { status: 400 });
+    return NextResponse.json({ error: "Failed to send" }, { status: 500 });
   }
 }

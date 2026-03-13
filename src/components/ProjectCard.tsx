@@ -3,20 +3,16 @@
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Project } from "@/data/projects";
-import { getDriveVideoEmbedUrl } from "@/lib/drive";
 import { useRef } from "react";
 
 export default function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const isPlaceholder = !project.driveVideoUrl || project.driveVideoUrl.includes("placeholder");
-  const embedUrl = isPlaceholder ? "" : getDriveVideoEmbedUrl(project.driveVideoUrl);
-  
   const cardRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: cardRef,
     offset: ["start end", "end start"]
   });
   
-  const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["-5%", "5%"]);
 
   return (
     <motion.div
@@ -40,19 +36,18 @@ export default function ProjectCard({ project, index }: { project: Project; inde
       <Link href={`/work/${project.id}`} className="block relative w-full aspect-video md:aspect-[21/9] rounded-none md:rounded-xl overflow-hidden bg-zinc-900 border border-white/5">
         
         {/* Parallax Container for the media */}
-        <motion.div style={{ y }} className="absolute inset-[-10%] z-0 w-[120%] h-[120%]">
-          {embedUrl ? (
-            <iframe
-              src={`${embedUrl}?autoplay=1&mute=1&loop=1&controls=0`}
-              className="w-full h-full pointer-events-none scale-105"
-              frameBorder="0"
-              allow="autoplay"
-              title={project.title}
+        <motion.div style={{ y }} className="absolute inset-[-5%] z-0 w-[110%] h-[110%]">
+          {project.thumbnail ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img 
+              src={project.thumbnail} 
+              alt={project.title}
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-zinc-700 font-mono text-sm">
-              Media Pending
+            <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-zinc-500">
+              <span className="text-4xl md:text-6xl font-bold tracking-tighter text-zinc-800">{project.title}</span>
             </div>
           )}
         </motion.div>
@@ -63,7 +58,7 @@ export default function ProjectCard({ project, index }: { project: Project; inde
         {/* Hover Overlay */}
         <div className="absolute inset-0 z-20 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center backdrop-blur-md">
           <span className="px-10 py-4 bg-foreground text-background rounded-full text-sm font-bold uppercase tracking-widest transform scale-90 group-hover:scale-100 transition-all duration-500 hover:bg-accent">
-            Play Reel
+            View Project
           </span>
           <p className="mt-8 text-white/70 max-w-md text-center text-sm px-6 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100 font-light">
             {project.description}

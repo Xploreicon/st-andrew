@@ -3,9 +3,10 @@ export type Project = {
   title: string;
   category: string;
   description: string;
-  driveVideoUrl: string;    // Google Drive share link or ID
-  driveGifUrls: string[];   // Google Drive share links or IDs for GIFs
-  styleframeUrls: string[]; // Google Drive share links or IDs for styleframes
+  thumbnail?: string;             // Static thumbnail for card preview
+  driveVideoUrl: string;          // Google Drive share link or ID
+  driveGifUrls: string[];         // Google Drive share links or IDs for GIFs
+  styleframeUrls: string[];       // Google Drive share links or IDs for styleframes
 };
 
 export const projects: Project[] = [
@@ -14,6 +15,7 @@ export const projects: Project[] = [
     title: "Waffles Waitlist Launch",
     category: "Product Launch",
     description: "A waitlist launch video for the Waffles app. Includes styleframes and GIF breakdowns.",
+    thumbnail: "/api/drive/1tvx55egY_0RFC-XdtGM_STbFUl9UXAZ2",
     driveVideoUrl: "https://drive.google.com/file/d/122-1QaKjfDjJDi1ZP1s9qpxSrPmYmZ5T/preview",
     driveGifUrls: [
       "/api/drive/14QWl2r-VrHZiX3SIteiMyZzPuqW6jo_1",
